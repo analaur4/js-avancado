@@ -3,7 +3,7 @@ let ConnectionFactory = (function () {
     const stores = ['negociacoes']; 
     const version = 3;
     const dbName = 'aluraframe';
-    
+
     let connection = null;
     let close = null;
     
@@ -15,13 +15,16 @@ let ConnectionFactory = (function () {
     
         static getConnection() {
             return new Promise((resolve, reject) => {
+                
+                // requisição de abertura
                 let openRequest = window.indexedDB.open(dbName, version);
-    
-                openRequest.onupgradeneeded = e => {
+
+                //  tenho que trabalhar com essa tríade de eventos para fazer a requisição de abertura ao banco                
+                openRequest.onupgradeneeded = e => { // quando for disparado executa essa função
                     ConnectionFactory._createStores(e.target.result);
                 }
                 
-                openRequest.onsuccess = e => {
+                openRequest.onsuccess = e => { // sempre executado quando conseguir obter uma conexão
                     if(!connection) {
                         connection = e.target.result;
                         close = connection.close.bind(connection);
@@ -32,7 +35,7 @@ let ConnectionFactory = (function () {
                     resolve(connection);
                 }
     
-                openRequest.onerror = e => {
+                openRequest.onerror = e => { // sempre executado quando der um erro
                     console.log(e.target.error);
                     reject(e.target.error.name);
                 }
